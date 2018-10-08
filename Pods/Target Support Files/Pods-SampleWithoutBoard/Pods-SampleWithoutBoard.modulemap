@@ -1,0 +1,6 @@
+framework module Pods_SampleWithoutBoard {
+  umbrella header "Pods-SampleWithoutBoard-umbrella.h"
+
+  export *
+  module * { export * }
+}

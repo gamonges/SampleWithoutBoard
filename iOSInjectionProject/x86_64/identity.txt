@@ -1,0 +1,2 @@
+/Users/gamouhiroto/Library/Developer/Xcode/DerivedData/SampleWithoutBoard-hjbiutmregxcsrgogbtisrcalniv/Build/Products/Debug-iphonesimulator/SampleWithoutBoard.app
+iPhone Developer

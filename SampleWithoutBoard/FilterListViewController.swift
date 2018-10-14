@@ -8,7 +8,26 @@
 
 import UIKit
 
+protocol FilterListViewControllerDelegate: class {
+    func filterListViewController(_ controller:FilterListViewController, didSelectFilter
+                                filter:String, index:Int)
+}
+
 class FilterListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    weak var delegate: FilterListViewcontrollerDelegate? = nil
+    var selectedIndex: Int = 0
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: indexPath){
+        if let myDelegate = delegate{
+            myDelegate.filterListViewController(self, didSelectFilter: filterList[indexPath.row], index: indexPath.row)
+            let count = (self.navigationController?.viewControllers.count)! - 2
+            let previousController = self.navigationController?.viewControllers[count]
+            previousController.selectedIndex = selectedIndex
+
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
     var myTableView : UITableView!
 
     let titleName: String
@@ -47,9 +66,9 @@ class FilterListViewController: UIViewController, UITableViewDelegate, UITableVi
 
         myTableView.register(UITableViewCell.self, forCellReuseIdentifier: "MyCell")
         myTableView.delegate = self
-        myTableView.datasource = self
+        myTableView.dataSource = self
 
-        self.view.addSubView(myTableView)
+        self.view.addSubview(myTableView)
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -71,7 +90,7 @@ class FilterListViewController: UIViewController, UITableViewDelegate, UITableVi
 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath)
 
         var filterName = filterList[indexPath.row]
         if filterName.isEmpty {

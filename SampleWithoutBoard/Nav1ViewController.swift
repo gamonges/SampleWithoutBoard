@@ -9,8 +9,13 @@
 import UIKit
 import SnapKit
 
-class Nav1ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    var selectedIndex: Int = 0
+
+    func filterListViewController(_ controller: FilterListViewcontroller, didSelectFilter filter: String, index: Int){
+        selectedIndex = index
+    }
     var myImageView: UIImageView!
     var myImage: UIImage = UIImage(named: "image2.jpg")!
     var tranditionFlag = true
@@ -91,17 +96,21 @@ class Nav1ViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     }()
 
 //trandition用view
-	myView = UIView(frame: self.view.frame)
-    myView.backgroundColor = UIColor.orange
-    myView.isHidden = true
-    myView.layer.position = CGPoint(x:self.view.frame.width/2, y:self.view.frame.height/2)
-	self.view.addSubview(myView)
+    private lazy var trandition: UIView = {
+        let trandition = UIView()
+        trandition.backgroundColor = UIColor.orange
+        trandition.isHidden = true
+        trandition.layer.position = CGPoint(x:self.view.frame.width/2, y:self.view.frame.height/2)
+        
+        return trandition
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.title = "Nav1"
         self.view.addSubview(container)
+        self.view.addSubview(trandition)
         container.snp.makeConstraints{make in
             make.edges.equalToSuperview()
         }
@@ -135,26 +144,23 @@ class Nav1ViewController: UIViewController, UIImagePickerControllerDelegate, UIN
 
     @objc func onTappedTranditionButton(_ sender: UIButton){
         if tranditionFlag {
-            UIView.trandition(from: self.view,
-								to tranditionView,
+            UIView.transition(from: self.view,
+                              to: trandition,
 									duration: 1.0,
-									options: UIViewAnimationOptions.tranditionCurlUp,
+									options: UIViewAnimationOptions.transitionCurlUp,
                                     completion: { (Bool) -> Void in
-                                    	print("self.view -> myView")
-                                    	self.myView.isHidden = false
-                                    	self.myView.addSubview(self.tranditionButton)
+                                    	print("self.view -> trandition")
+                                    	self.trandition.isHidden = false
                                     })
             tranditionFlag = false
         }else {
-            UIView.transition(from: myView,
+            UIView.transition(from: trandition,
                               to: self.view,
                                       duration: 1.0,
                                       options: UIViewAnimationOptions.transitionFlipFromLeft,
                                       completion: { (Bool) -> Void in
 
-                                        print("myView -> self.view")
-
-                                        self.view.addSubview(self.tranditionButton)
+                                        print("trandition -> self.view")
             })
             tranditionFlag = true
         }
@@ -186,10 +192,6 @@ class Nav1ViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             myImage = editedImage
         }
 
-//        if myImageView.image != nil {
-//            myLabel.isHidden = true
-//        }
-        
         picker.dismiss(animated: true, completion: nil)
     }
 

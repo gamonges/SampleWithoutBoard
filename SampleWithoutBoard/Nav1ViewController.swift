@@ -9,13 +9,12 @@
 import UIKit
 import SnapKit
 
-class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class Nav1ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var selectedIndex: Int = 0
+    let controller:FilterListViewController = FilterListViewController(titleName: "")
+    var selectedIndex: Int!
 
-    func filterListViewController(_ controller: FilterListViewcontroller, didSelectFilter filter: String, index: Int){
-        selectedIndex = index
-    }
+
     var myImageView: UIImageView!
     var myImage: UIImage = UIImage(named: "image2.jpg")!
     var tranditionFlag = true
@@ -67,7 +66,7 @@ class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UI
 
         let editButton = UIButton(type: .system)
         container.addSubview(editButton)
-        editButton.setTitle("pickup a picture!", for: .normal)
+        editButton.setTitle("edit a picture!", for: .normal)
         editButton.tintColor = UIColor.white
         editButton.backgroundColor = UIColor.blue
         editButton.layer.shadowColor = UIColor.black.cgColor
@@ -105,9 +104,32 @@ class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UI
         return trandition
     }()
 
+    func setCellIndex(index: Int, filter: String){
+        selectedIndex = index
+        print(selectedIndex!)
+
+        if filter.isEmpty {
+            selectedIndex = 0
+            myImageView.image = myImage
+            return
+        }
+
+        let filter: CIFilter = CIFilter(name: filter)!
+        let ciImage: CIImage = CIImage(image: myImage)!
+
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+
+        if let filteredImage: CIImage = filter.outputImage {
+            let context = CIContext(options: nil)
+            let cgiImage = context.createCGImage(filteredImage, from: filteredImage.extent)
+
+            let image = UIImage(cgImage: cgiImage!, scale: UIScreen.main.scale, orientation: myImage.imageOrientation)
+            myImageView.image = image
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         navigationItem.title = "Nav1"
         self.view.addSubview(container)
         self.view.addSubview(trandition)
@@ -139,6 +161,12 @@ class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UI
     }
     @objc func onTappedEditButton(_ sender: UIButton){
         let vc = FilterListViewController(titleName: "filter")
+        if (selectedIndex != nil) {
+            vc.selectedIndex = selectedIndex!
+            print(selectedIndex!)
+        }else{
+            vc.selectedIndex = 0
+        }
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -190,6 +218,8 @@ class Nav1ViewController: UIViewController, FilterListViewControllerDelegate, UI
         if let editedImage: UIImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             myImageView.image = editedImage
             myImage = editedImage
+
+            selectedIndex = 0
         }
 
         picker.dismiss(animated: true, completion: nil)

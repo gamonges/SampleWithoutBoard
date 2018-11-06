@@ -15,16 +15,18 @@ protocol FilterListViewControllerDelegate: class {
 
 class FilterListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    weak var delegate: FilterListViewcontrollerDelegate? = nil
-    var selectedIndex: Int = 0
+    weak var delegate: FilterListViewControllerDelegate? = nil
+    var selectedIndex: Int!
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: indexPath){
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
         if let myDelegate = delegate{
             myDelegate.filterListViewController(self, didSelectFilter: filterList[indexPath.row], index: indexPath.row)
-            let count = (self.navigationController?.viewControllers.count)! - 2
-            let previousController = self.navigationController?.viewControllers[count]
-            previousController.selectedIndex = selectedIndex
 
+        }else{
+            let popViewController = self.navigationController?.viewControllers[0] as! Nav1ViewController
+            print(selectedIndex)
+            selectedIndex = indexPath.row
+            popViewController.setCellIndex(index: selectedIndex!, filter: filterList[selectedIndex])
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -97,6 +99,11 @@ class FilterListViewController: UIViewController, UITableViewDelegate, UITableVi
             filterName = "No Effect"
         }
         cell.textLabel?.text = filterName
+
+        cell.accessoryType = UITableViewCellAccessoryType.none
+        if indexPath.row == selectedIndex{
+            cell.accessoryType = UITableViewCellAccessoryType.checkmark
+        }
 
         return cell
     }
